@@ -190,7 +190,7 @@ int main(int argc, char** argv)
 	}
 
 	std::fstream file;
-	file.open(argv[2], std::ios_base::out);
+	file.open(argv[2], std::ios_base::out | std::ios_base::app);
 	if(!file.is_open())
 	{
 		Log(Log::ERROR)<<"Could not open "<<argv[2]<<" for writeing";
@@ -198,7 +198,7 @@ int main(int argc, char** argv)
 	}
 
 	std::fstream rejectFile;
-	rejectFile.open("rej.txt", std::ios_base::out);
+	rejectFile.open("rej.txt", std::ios_base::out | std::ios_base::app);
 	if(!rejectFile.is_open())
 		Log(Log::WARN)<<"Could not open reject file at rej.txt";
 
