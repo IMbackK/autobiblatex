@@ -173,6 +173,12 @@ static std::string bibtexEntryFromHeuristic(poppler::document* document, std::st
 	}
 	if(tokenize(subject, ' ').size() > 25)
 		subject.clear();
+	if(creator.find("Acrobat") != std::string::npos ||
+		creator.find("ersion") != std::string::npos ||
+		creator.find("Latex") != std::string::npos ||
+		creator.find("LaTex") != std::string::npos ||
+		creator.find("Word") != std::string::npos)
+		creator.clear();
 
 	struct tm* timeS = gmtime(&cretionTime);
 
