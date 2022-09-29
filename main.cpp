@@ -28,6 +28,7 @@
 #include <cassert>
 #include <fstream>
 #include <ctime>
+#include <algorithm>
 
 #include "log.h"
 #include "tokenize.h"
@@ -127,6 +128,36 @@ static std::string bibtexEntryFromCrossref(poppler::document* document)
 	return "";
 }
 
+static bool isWhitespace(const char in)
+{
+	switch(in)
+	{
+		case ' ':
+		case '\t':
+		return true;
+		default:
+		return false;
+	}
+}
+
+static bool isLatexSpecial(const char in)
+{
+	switch(in)
+	{
+		case '/':
+		case '{':
+		case '}':
+		case '"':
+		case '\'':
+		case '\\':
+		case '\n':
+		case '\t':
+		return true;
+		default:
+		return false;
+	}
+}
+
 static std::string bibtexEntryFromHeuristic(poppler::document* document, std::string basename)
 {
 	std::string keywords = document->get_keywords().to_latin1();
@@ -135,13 +166,23 @@ static std::string bibtexEntryFromHeuristic(poppler::document* document, std::st
 	std::string subject = document->get_subject().to_latin1();
 	std::string creator = document->get_creator().to_latin1();
 	time_t cretionTime = document->get_creation_date_t();
-	if(title.empty() || author.empty())
+	if(title.size() < 5 || author.size() < 4 || tokenize(title, ' ').size() > 25)
 	{
 		Log(Log::WARN)<<"Coult not create bibtex entry by heuristic";
 		return "";
 	}
+	if(tokenize(subject, ' ').size() > 25)
+		subject.clear();
 
 	struct tm* timeS = gmtime(&cretionTime);
+
+	basename.resize(std::remove_if(basename.begin(), basename.end(), &isWhitespace) - basename.begin());
+	basename.resize(std::remove_if(basename.begin(), basename.end(), &isLatexSpecial) - basename.begin());
+	keywords.resize(std::remove_if(keywords.begin(), keywords.end(), &isLatexSpecial) - keywords.begin());
+	title.resize(std::remove_if(title.begin(), title.end(), &isLatexSpecial) - title.begin());
+	author.resize(std::remove_if(author.begin(), author.end(), &isLatexSpecial) - author.begin());
+	subject.resize(std::remove_if(subject.begin(), subject.end(), &isLatexSpecial) - subject.begin());
+	creator.resize(std::remove_if(creator.begin(), creator.end(), &isLatexSpecial) - creator.begin());
 
 	std::string bibtexEntry;
 	bibtexEntry.append("@article{");
