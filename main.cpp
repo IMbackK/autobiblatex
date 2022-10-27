@@ -133,6 +133,7 @@ static bool isWhitespace(const char in)
 	switch(in)
 	{
 		case ' ':
+		case '.':
 		case '\t':
 		return true;
 		default:
