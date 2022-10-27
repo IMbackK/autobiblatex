@@ -268,6 +268,7 @@ int main(int argc, char** argv)
 				if(!bibtexEntry.empty())
 				{
 					file<<bibtexEntry<<'\n'<<'\n';
+					delete document;
 					continue;
 				}
 
@@ -282,6 +283,7 @@ int main(int argc, char** argv)
 					if(rejectFile.is_open())
 						rejectFile<<entry.path()<<'\n';
 				}
+				delete document;
 			}
 		}
 	}
